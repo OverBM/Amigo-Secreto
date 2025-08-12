@@ -55,6 +55,10 @@ Amigo-Secreto/
 Para poner en funcionamiento este proyecto, no se requiere ningún paso de construcción ni la instalación de dependencias externas. Siga estos sencillos pasos:
 
 1.  **Clonar el repositorio:** Abra su terminal o línea de comandos y ejecute el siguiente comando.
+     ```bash
+    git clone --single-branch --branch main https://github.com/OverBM/Amigo-Secreto.git
+    ``` 
+    En caso de que no funcione clonar directamente desde el main puede usar esta otra forma:
     ```bash
     git clone https://github.com/OverBM/Amigo-Secreto.git
     ```
