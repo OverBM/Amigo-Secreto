@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es-mx">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amigo Secreto</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<body>
+  <canvas id="fondo-animado"></canvas>
+  <img src="assets/moon.gif" alt="Luna" class="gif-luna">
+  <img src="assets/moon.gif" alt="Luna" class="gif-luna2">
+  
+  <main class="contenido-principal">
+    <h1>Amigo Secreto</h1>
+    <h2>Digite el nombre de sus amigos</h2>
+    <div class="input-grupo">
+      <input type="text" id="entrada-nombre" placeholder="Escribe un nombre" />
+      <button id="boton-agregar">Agregar</button>
+    </div>
+    <div class="botones-grupo">
+      <button id="boton-sortear"><span></span> Sortear normal</button>
+      <button id="boton-sortear-eliminar">Sortear por eliminacion</button>
+      <button id="boton-ver-lista">Mostrar lista</button>
+    </div>
+    <button id="boton-sortear-nuevamente" style="display: none;">Hacer nuevo sorteo</button>
+
+    <div id="contenedor-lista">
+      <ul id="lista-amigos"></ul>
+    </div>
+  </main>
+  <div id="contenedor-ruleta" class="contenedor-ruleta">
+  <div class="ruleta-wrapper">
+    <div class="indicador-ruleta"></div>
+    <div class="ruleta" id="ruleta"></div>
+    <div class="texto-ruleta">¡Girando la ruleta!</div>
+  </div>
+  </div>
+  <audio id="sonido-sorteo" src="/assets/sonidowin.mp3" preload="auto"></audio>
+  <audio id="sonido-ruleta-tick" src="/assets/tick.mp3" preload="auto"></audio>
+  <script src="app.js" defer></script>
+</body>
+</html>
