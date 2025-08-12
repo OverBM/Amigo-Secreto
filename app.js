@@ -423,15 +423,14 @@ class FondoAnimado {
   
   deshabilitarEventosMoviles() {
     // Prevenir interacciones táctiles que causan lag
-    const preventDefault = (e) => e.preventDefault();
+      const preventDefault = (e) => e.preventDefault();
     
-    window.addEventListener("touchstart", preventDefault, { passive: false });
-    window.addEventListener("touchmove", preventDefault, { passive: false });
-    window.addEventListener("touchend", preventDefault, { passive: false });
+      this.canvas.addEventListener("touchstart", preventDefault, { passive: false });
+      this.canvas.addEventListener("touchmove", preventDefault, { passive: false });
+      this.canvas.addEventListener("touchend", preventDefault, { passive: false });
     
-    // Cursor siempre nulo en móviles
-    this.cursor.x = null;
-    this.cursor.y = null;
+      this.cursor.x = null;
+      this.cursor.y = null;
   }
   
   crearParticulas() {
