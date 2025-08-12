@@ -24,7 +24,7 @@
 body {
   font-family: var(--fuente-principal);
   color: var(--color-texto);
-  background-color: transparent;
+  background-color: var(--color-fondo);
   overflow: hidden;
   height: 100vh;
   position: relative;
@@ -467,6 +467,10 @@ button {
   font-weight: bold;
   text-align: center;
   margin-top: 1rem;
+}
+
+button, a, input {
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Animaciones */
