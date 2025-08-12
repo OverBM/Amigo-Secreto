@@ -1,4 +1,4 @@
-// Variables
+// Variables globales
 const entrada = document.getElementById('entrada-nombre');
 const botonAgregar = document.getElementById('boton-agregar');
 const botonSortear = document.getElementById('boton-sortear');
@@ -36,7 +36,7 @@ function crearRuleta(nombres) {
   const segmentos = nombres.length;
   const anguloPorSegmento = 360 / segmentos;
   const radioTranslate = obtenerRadioTranslate();
-
+  
   // Generar el background con todos los colores
   const gradiente = nombres.reduce((acc, _, index) => {
     const color = coloresRuleta[index % coloresRuleta.length];
@@ -44,9 +44,9 @@ function crearRuleta(nombres) {
     const fin = inicio + anguloPorSegmento;
     return acc + `${color} ${inicio}deg ${fin}deg${index < nombres.length - 1 ? ', ' : ''}`;
   }, 'conic-gradient(') + ')';
-
+  
   ruleta.style.background = gradiente;
-
+  
   // Posicionar los textos sobre la ruleta
   nombres.forEach((nombre, index) => {
     const angulo = index * anguloPorSegmento + anguloPorSegmento / 2;
@@ -106,24 +106,24 @@ function girarRuleta(callback, nombreGanador) {
     console.error('Nombre no encontrado en la lista');
     return;
   }
-
+  
   const anguloCentroGanador = indiceGanador * anguloPorSegmento + anguloPorSegmento / 2;
   const vueltas = 5;
   const anguloFinal = (vueltas * 360) + (360 - anguloCentroGanador) + 90;
-
+  
   animacionTerminada = false;
   girandoRuleta = true;
   
   ruleta.style.transition = 'none';
   ruleta.style.transform = `rotate(${anguloActual}deg)`;
   void ruleta.offsetWidth; // Forzar reflow
-
+  
   requestAnimationFrame(() => {
     ruleta.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)';
     ruleta.style.transform = `rotate(${anguloFinal}deg)`;
     anguloActual = anguloFinal % 360;
   });
-
+  
   setTimeout(() => {
     if (!animacionTerminada) {
       animacionTerminada = true;
@@ -144,7 +144,7 @@ function actualizarLista() {
     lista.appendChild(li);
     return;
   }
-
+  
   nombres.forEach((nombre, index) => {
     const li = document.createElement('li');
     li.className = 'item-lista';
@@ -186,7 +186,7 @@ function agregarNombre() {
     alert("El nombre ya está en la lista.");
     return;
   }
-
+  
   nombres.push(nombre);
   entrada.value = '';
   actualizarLista();
@@ -212,7 +212,7 @@ function mostrarNombreSorteado(nombre, mostrarEfectos = true) {
       origin: { y: 0.4 }
     });
   }
-
+  
   // Mostrar el nombre sorteado
   lista.innerHTML = '';
   const li = document.createElement('li');
@@ -229,7 +229,7 @@ function sortearNombre() {
   }
   
   if (girandoRuleta) return;
-
+  
   const indice = Math.floor(Math.random() * nombres.length);
   const nombre = nombres[indice];
   ultimoNombreSorteado = nombre;
@@ -251,7 +251,7 @@ function sortearPorEliminacion() {
   }
   
   if (girandoRuleta) return;
-
+  
   const indice = Math.floor(Math.random() * nombres.length);
   const nombre = nombres[indice];
   ultimoNombreSorteado = nombre;
@@ -309,7 +309,7 @@ function listaNombres() {
   }
 }
 
-// Lista de eventos
+// Inicializar eventos principales
 function inicializarEventos() {
   botonAgregar.addEventListener('click', agregarNombre);
   botonSortear.addEventListener('click', sortearNombre);
@@ -329,7 +329,7 @@ function inicializarEventos() {
   });
 }
 
-// Fondo animado estelar
+// Clase para el fondo animado optimizado
 class FondoAnimado {
   constructor() {
     this.canvas = document.getElementById("fondo-animado");
@@ -337,14 +337,39 @@ class FondoAnimado {
     this.particulas = [];
     this.cursor = { x: null, y: null };
     
+    this.inicializarConfiguracion();
     this.init();
+  }
+  
+  inicializarConfiguracion() {
+    // Detección de dispositivos
+    this.esMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    this.esDispositivoLento = this.esMobile || window.innerWidth < 1200 || navigator.hardwareConcurrency < 4;
+    
+    // Configuración fija de partículas
+    this.config = {
+      numParticulas: 120, // 120 partículas
+      velocidadMaxima: this.esDispositivoLento ? 0.8 : 1.5,
+      radioMaximo: this.esDispositivoLento ? 1.5 : 2,
+      distanciaConexion: this.esDispositivoLento ? 60 : 100,
+      distanciaInteraccion: this.esDispositivoLento ? 0 : 150, // Sin interacción en móviles
+      opacidadFondo: this.esDispositivoLento ? 0.4 : 0.3,
+      factorInteraccion: 0.015,
+      colorParticula: "#aaa9a0ff",
+      anchoLinea: this.esDispositivoLento ? 0.6 : 0.8
+    };
+    
+    // Control de FPS
+    this.ultimoFrame = 0;
+    this.fps = this.esDispositivoLento ? 30 : 60;
+    this.intervaloFrame = 1000 / this.fps;
   }
   
   init() {
     this.ajustarCanvas();
-    this.crearParticulas(160);
+    this.crearParticulas();
     this.configurarEventos();
-    this.animar();
+    this.animar(0);
   }
   
   ajustarCanvas() {
@@ -353,91 +378,172 @@ class FondoAnimado {
   }
   
   configurarEventos() {
-    window.addEventListener("resize", () => this.ajustarCanvas());
+    // Resize con throttle
+    let resizeTimeout;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        this.ajustarCanvas();
+      }, 150);
+    });
     
+    // Solo eventos de interacción en dispositivos de escritorio
+    if (!this.esDispositivoLento) {
+      this.configurarEventosEscritorio();
+    } else {
+      this.deshabilitarEventosMoviles();
+    }
+  }
+  
+  configurarEventosEscritorio() {
+    // Mousemove con throttle
+    let mouseMoveTimeout;
     window.addEventListener("mousemove", (e) => {
-      this.cursor.x = e.clientX;
-      this.cursor.y = e.clientY;
+      if (!mouseMoveTimeout) {
+        mouseMoveTimeout = setTimeout(() => {
+          this.cursor.x = e.clientX;
+          this.cursor.y = e.clientY;
+          mouseMoveTimeout = null;
+        }, 16);
+      }
     });
     
     window.addEventListener("click", () => {
       this.particulas.forEach(p => {
-        p.dx = (Math.random() - 0.5) * 2;
-        p.dy = (Math.random() - 0.5) * 2;
+        p.dx = (Math.random() - 0.5) * this.config.velocidadMaxima;
+        p.dy = (Math.random() - 0.5) * this.config.velocidadMaxima;
       });
+    });
+    
+    window.addEventListener("mouseleave", () => {
+      this.cursor.x = null;
+      this.cursor.y = null;
     });
   }
   
-  crearParticulas(num) {
+  deshabilitarEventosMoviles() {
+    // Prevenir interacciones táctiles que causan lag
+      const preventDefault = (e) => e.preventDefault();
+    
+      this.canvas.addEventListener("touchstart", preventDefault, { passive: false });
+      this.canvas.addEventListener("touchmove", preventDefault, { passive: false });
+      this.canvas.addEventListener("touchend", preventDefault, { passive: false });
+    
+      this.cursor.x = null;
+      this.cursor.y = null;
+  }
+  
+  crearParticulas() {
     this.particulas = [];
-    for (let i = 0; i < num; i++) {
+    for (let i = 0; i < this.config.numParticulas; i++) {
       this.particulas.push({
         x: Math.random() * this.ancho,
         y: Math.random() * this.alto,
-        dx: (Math.random() - 0.5) * 1.5,
-        dy: (Math.random() - 0.5) * 1.5,
-        radio: Math.random() * 2 + 1
+        dx: (Math.random() - 0.5) * this.config.velocidadMaxima,
+        dy: (Math.random() - 0.5) * this.config.velocidadMaxima,
+        radio: Math.random() * this.config.radioMaximo + 1
       });
     }
   }
   
-  animar() {
-    this.ctx.fillStyle = "rgba(0, 0, 19, 0.3)";
-    this.ctx.fillRect(0, 0, this.ancho, this.alto);
+  animar(tiempoActual) {
+    // Control de FPS
+    if (tiempoActual - this.ultimoFrame < this.intervaloFrame) {
+      requestAnimationFrame(this.animar.bind(this));
+      return;
+    }
+    this.ultimoFrame = tiempoActual;
     
+    this.limpiarCanvas();
+    this.actualizarParticulas();
+    this.dibujarParticulas();
+    
+    // Solo dibujar conexiones en escritorio para mejor rendimiento
+    if (!this.esDispositivoLento) {
+      this.dibujarConexiones();
+    }
+    
+    requestAnimationFrame(this.animar.bind(this));
+  }
+  
+  limpiarCanvas() {
+    this.ctx.fillStyle = `rgba(0, 0, 19, ${this.config.opacidadFondo})`;
+    this.ctx.fillRect(0, 0, this.ancho, this.alto);
+  }
+  
+  actualizarParticulas() {
     this.particulas.forEach(p => {
-      // Movimiento
+      // Movimiento básico
       p.x += p.dx;
       p.y += p.dy;
       
-      // Rebotes en bordes
-      if (p.x < 0 || p.x > this.ancho) p.dx *= -1;
-      if (p.y < 0 || p.y > this.alto) p.dy *= -1;
-      
-      // Interacción con cursor
-      if (this.cursor.x !== null && this.cursor.y !== null) {
-        const dx = this.cursor.x - p.x;
-        const dy = this.cursor.y - p.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        
-        if (dist < 150) {
-          p.x += dx * 0.015;
-          p.y += dy * 0.015;
-        }
+      // Rebotes optimizados
+      if (p.x < 0 || p.x > this.ancho) {
+        p.dx *= -1;
+        p.x = Math.max(0, Math.min(this.ancho, p.x));
+      }
+      if (p.y < 0 || p.y > this.alto) {
+        p.dy *= -1;
+        p.y = Math.max(0, Math.min(this.alto, p.y));
       }
       
-      // Dibujar partícula
+      // Interacción con cursor solo en escritorio
+      if (!this.esDispositivoLento && this.cursor.x !== null && this.cursor.y !== null) {
+        this.aplicarInteraccionCursor(p);
+      }
+    });
+  }
+  
+  aplicarInteraccionCursor(particula) {
+    const dx = this.cursor.x - particula.x;
+    const dy = this.cursor.y - particula.y;
+    const distSq = dx * dx + dy * dy;
+    const maxDistSq = this.config.distanciaInteraccion * this.config.distanciaInteraccion;
+    
+    if (distSq < maxDistSq) {
+      const factor = this.config.factorInteraccion * (1 - distSq / maxDistSq);
+      particula.x += dx * factor;
+      particula.y += dy * factor;
+    }
+  }
+  
+  dibujarParticulas() {
+    this.ctx.fillStyle = this.config.colorParticula;
+    this.particulas.forEach(p => {
       this.ctx.beginPath();
       this.ctx.arc(p.x, p.y, p.radio, 0, Math.PI * 2);
-      this.ctx.fillStyle = "#aaa9a0ff";
+
       this.ctx.fill();
     });
-    
-    // Dibujar conexiones
+  }
+  
+  dibujarConexiones() {
+    const distanciaSq = this.config.distanciaConexion * this.config.distanciaConexion;
     for (let i = 0; i < this.particulas.length; i++) {
       for (let j = i + 1; j < this.particulas.length; j++) {
         const a = this.particulas[i];
         const b = this.particulas[j];
         const dx = a.x - b.x;
         const dy = a.y - b.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+        const distSq = dx * dx + dy * dy;
         
-        if (dist < 100) {
-          const opacidad = 0.1 + (1 - dist / 100);
+        if (distSq < distanciaSq) {
+          const opacidad = 0.1 + (1 - distSq / distanciaSq) * 0.3;
           this.ctx.beginPath();
           this.ctx.moveTo(a.x, a.y);
           this.ctx.lineTo(b.x, b.y);
           this.ctx.strokeStyle = `rgba(255,255,255,${opacidad})`;
-          this.ctx.lineWidth = 0.8;
+          this.ctx.lineWidth = this.config.anchoLinea;
           this.ctx.stroke();
         }
       }
     }
-    
-    requestAnimationFrame(() => this.animar());
+  
   }
 }
 
 // Inicializar aplicación
-inicializarEventos();
-new FondoAnimado();
+document.addEventListener('DOMContentLoaded', () => {
+  inicializarEventos();
+  new FondoAnimado();
+});
