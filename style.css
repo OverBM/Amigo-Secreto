@@ -24,7 +24,7 @@
 body {
   font-family: var(--fuente-principal);
   color: var(--color-texto);
-  background-color: transparent;
+  background-color: var(--color-fondo);
   overflow: hidden;
   height: 100vh;
   position: relative;
@@ -41,7 +41,7 @@ canvas#fondo-animado {
   display: block;
 }
 
-/* Contenido principal */
+/* Contenido principal con scroll personalizado para móviles */
 .contenido-principal {
   padding: 4rem 2rem;
   max-width: 700px;
@@ -51,6 +51,32 @@ canvas#fondo-animado {
   position: relative;
   z-index: 10;
   animation: animacion-subir 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  max-height: 100vh;
+  overflow-y: auto;
+  
+  /* Scroll personalizado para todas las pantallas */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+/* Estilos del scroll para navegadores WebKit */
+.contenido-principal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.contenido-principal::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.contenido-principal::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.4));
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.contenido-principal::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.6));
 }
 
 /* Gifs-Imagenes */
@@ -259,28 +285,37 @@ button {
   max-height: 500px;
   opacity: 1;
   overflow-y: auto;
+  
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
 
-/* Estilos del scroll para navegadores */
+/* Estilos del scroll para la lista  */
 #contenedor-lista.activa::-webkit-scrollbar {
-  width: 10px; /* Ancho de la barra de desplazamiento */
+  width: 12px;
 }
 
 #contenedor-lista.activa::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  margin: 5px;
 }
 
 #contenedor-lista.activa::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.5));
   border-radius: 10px;
-  border: 2px solid rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
 }
 
 #contenedor-lista.activa::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-acento);
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.7));
   border-color: var(--color-acento);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+#contenedor-lista.activa::-webkit-scrollbar-thumb:active {
+  background: var(--color-acento);
 }
 
 /* Lista de amigos */
@@ -434,6 +469,10 @@ button {
   margin-top: 1rem;
 }
 
+button, a, input {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Animaciones */
 @keyframes animacion-subir {
   from {
@@ -448,37 +487,65 @@ button {
 
 /* Responsive para pantallas menores a 1200px */
 @media (max-width: 1200px) {
-  .contenido-principal {
-    padding: 3rem 1.5rem;
-    max-width: 95%;
+  body {
+    overflow: auto;
   }
-
+  
+  .contenido-principal {
+    padding: 2rem 1.5rem;
+    max-width: 95%;
+    max-height: none;
+    overflow-y: visible;
+    
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .contenido-principal::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .contenido-principal::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 3px;
+  }
+  
   .gif-luna {
     top: 5%;
     right: 5%;
-    width: clamp(150px, 15vw, 300px);
+    width: clamp(120px, 12vw, 250px);
+    opacity: 0.6;
   }
-
+  
   .gif-luna2 {
     top: 5%;
     left: 5%;
-    width: clamp(150px, 15vw, 300px);
+    width: clamp(120px, 12vw, 250px);
+    opacity: 0.6;
   }
-
+  
   h1 {
     font-size: 2.8rem;
   }
-
+  
   h2 {
     font-size: 1.4rem;
   }
-
+  
   /* Ajustes para la lista y sus elementos */
   #contenedor-lista.activa {
-    max-height: 400px;
+    max-height: 350px;
     padding: 0.5rem;
   }
-
+  
+  #contenedor-lista.activa::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  #contenedor-lista.activa::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.6));
+    border-radius: 6px;
+  }
+  
   .item-lista {
     padding: 0.6rem 0.8rem;
     display: flex;
@@ -487,7 +554,7 @@ button {
     flex-wrap: nowrap;
     overflow: hidden;
   }
-
+  
   .nombre-item {
     font-size: 0.9rem;
     word-break: break-all;
@@ -495,7 +562,7 @@ button {
     min-width: 0;
     line-height: 1.2;
   }
-
+  
   .boton-eliminar {
     flex-shrink: 0;
     padding: 0.25rem 0.6rem;
@@ -503,13 +570,12 @@ button {
     margin-left: 0.5rem;
     white-space: nowrap;
   }
-
-  /* Estilos para los botones del grupo principal */
+  
   .botones-grupo {
     flex-direction: column;
     gap: 0.8rem;
   }
-
+  
   #boton-sortear,
   #boton-ver-lista,
   #boton-sortear-eliminar,
@@ -518,27 +584,65 @@ button {
     font-size: 0.9rem;
     padding: 0.8rem 1.2rem;
   }
-
+  
   .ruleta-wrapper {
     width: 350px;
     height: 350px;
   }
-
+  
   .ruleta {
     width: 350px;
     height: 350px;
   }
-
+  
   .texto-segmento {
     font-size: 1.35rem;
     width: 80px;
     margin-left: -40px;
     line-height: 1.2rem;
   }
-
+  
   .indicador-ruleta {
     border-left: 15px solid transparent;
     border-right: 15px solid transparent;
     border-bottom: 25px solid var(--color-boton);
+  }
+}
+
+/* Scroll para pantallas menores a 480px */
+@media (max-width: 480px) {
+  .contenido-principal {
+    padding: 1.5rem 1rem;
+  }
+  
+  .input-grupo {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  input[type="text"] {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  #boton-agregar {
+    width: 100%;
+  }
+  
+  .gif-luna,
+  .gif-luna2 {
+    width: clamp(80px, 15vw, 150px);
+    opacity: 0.4;
+  }
+  
+  /* Scroll más grueso en pantallas muy pequeñas para mejor usabilidad */
+  .contenido-principal::-webkit-scrollbar,
+  #contenedor-lista.activa::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  .contenido-principal::-webkit-scrollbar-thumb,
+  #contenedor-lista.activa::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.5);
   }
 }
