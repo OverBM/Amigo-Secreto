@@ -1,5 +1,11 @@
 # AmigoSecreto
 
+---
+### Importante
+**USAR EL BRANCH MAIN, EN GH-PAGES ESTA MODIFICADO PARA EL CONTENIDO DE GITHUB, DEBIDO A QUE EL GIF moon.gif ES DEMASIADO GRANDE**
+
+---
+
 ### Descripción
 
 **AmigoSecreto** es una aplicación web interactiva desarrollada con HTML, CSS y JavaScript, diseñada como un sorteo de un juego llamado "Amigo Secreto". El proyecto ofrece una experiencia de usuario atractiva y gamificada, permitiendo a los participantes ingresar nombres y visualizarlos en una ruleta animada que realiza la selección aleatoria. La pagina web cuenta con responsive, lo que permite abrir en cualquier dispositivo con conexion a internet, ademas de no tener dependencias de servidor.
